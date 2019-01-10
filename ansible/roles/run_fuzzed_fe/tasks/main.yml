@@ -1,6 +1,0 @@
----
-- include: django.yml
-
-- name: Ensure PostgreSQL Python client library is installed
-  pip: name=psycopg2-binary
-  sudo: yes

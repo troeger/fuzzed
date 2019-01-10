@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  ore-db:
+    image: postgres:9
+    container_name: ore-db
+    environment:
+      POSTGRES_PASSWORD: ore
+      POSTGRES_USER: ore
+      POSTGRES_DB: ore
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data  
+  ore-front-dev:
+    image: ore-front-dev
+    container_name: ore-front-dev
+    build: 
+      context: .
+      dockerfile: ./frontend/docker/Dockerfile.development
+    environment:
+      ORE_BACKEND_DAEMON: http://ore-back-dev:8000
+      ORE_SERVER_URL: http://ore-front-dev:8000
+      ORE_SERVER: ore-front-dev
+      ORE_DB_NAME: ore 
+      ORE_DB_USER: ore 
+      ORE_DB_PASSWORD: ore 
+      ORE_DB_HOST: ore-db 
+    tty: true
+    ports:
+      - 8000:8000
+    depends_on:
+      - ore-db
+      - ore-back-dev
+    volumes:
+      - ./frontend:/ore-front
+      - ./common:/ore-common 
+  ore-back-dev:
+    image: ore-back-dev
+    container_name: ore-back-dev
+    build: 
+      context: .
+      dockerfile: ./backends/docker/Dockerfile.development
+    tty: true
+    volumes:
+      - ./backends:/ore-back 
+      - ./common:/ore-common 
+
+volumes:
+  postgres-volume:

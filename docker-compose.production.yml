@@ -15,9 +15,8 @@ services:
     container_name: ore-front
     build: 
       context: .
-      dockerfile: ./frontend/docker/Dockerfile
+      dockerfile: ./frontend/docker/Dockerfile.production
     environment:
-      DJANGO_CONFIGURATION: Dev
       ORE_BACKEND_DAEMON: http://back:8000
       ORE_SERVER_URL: http://front:8000
       ORE_SERVER: front
@@ -30,6 +29,7 @@ services:
       - 8000:8000
     depends_on:
       - db
+      - back
     volumes:
       - ./frontend:/ore-front
       - ./common:/ore-common 
@@ -38,7 +38,7 @@ services:
     container_name: ore-back
     build: 
       context: .
-      dockerfile: ./backends/docker/Dockerfile
+      dockerfile: ./backends/docker/Dockerfile.production
     tty: true
     volumes:
       - ./backends:/ore-back 

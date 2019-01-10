@@ -1,8 +1,0 @@
----
-- name: Ensure CMake is installed (Debian)
-  apt: name=cmake state=present
-  sudo: yes
-  when: ansible_os_family == "Debian"
-- name: Ensure CMake is installed (Darwin)
-  homebrew: name=cmake state=present
-  when: ansible_os_family == "Darwin"

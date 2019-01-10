@@ -1,42 +1,37 @@
-# Create docker images and start them
-up:
-	docker-compose up -d
+dev-build:
+	docker-compose -f docker-compose.development.yml build
+	docker-compose -f docker-compose.development.yml up -d
+	docker exec -w /ore-front ore-front-dev scons
+	docker exec -w /ore-back ore-back-dev cmake .
+	docker exec -w /ore-back ore-back-dev make
+	docker-compose -f docker-compose.development.yml down
 
-# Stop docker images
-down:
-	docker-compose down
+dev-up:
+	docker-compose -f docker-compose.development.yml up
 
-# Build frontend code in the running docker image
-front-build: up
-	docker exec -w /ore-front ore-front scons
+dev-down:
+	docker-compose -f docker-compose.development.yml down 
 
-# Build backend code in the running docker image
-back-build: up
-	docker exec -w /ore-back ore-back cmake .
-	docker exec -w /ore-back ore-back make
+dev-clean:
+	docker exec ore-front-dev /usr/bin/scons -C /ore-front -c
+	docker exec -w /ore-back ore-back-dev make clean
 
-# Build frontend and backend
-build: front-build back-build
+dev-back-log:
+	docker logs ore-back-dev -f
 
-# Clean frontend build
-front-clean: up
-	docker exec ore-front /usr/bin/scons -C /ore-front -c
+dev-front-log:
+	docker logs ore-front-dev -f
 
-# Clean backend build
-back-clean: up
-	docker exec -w /ore-back ore-back make clean
+dev-front-shell:
+	docker exec -it ore-front-dev bash
 
-# Clean frontend and backend build
-clean: front-clean back-clean
+dev-back-shell:
+	docker exec -it ore-back-dev bash
 
-# Get shell in running frontend docker image
-front-shell: up
-	docker exec -it ore-front bash
+prod-build:
+	docker-compose -f docker-compose.production.yml build
 
-# Get shell in running backend docker image
-back-shell: up
-	docker exec -it ore-back bash
 
-# Run test suite
-test: up
-	docker exec ore-front bash -c "cd /ore-front; python manage.py test"
+
+
+

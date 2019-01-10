@@ -1,9 +1,0 @@
-import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'FuzzEd.settings')
-{% for k,v in env_vars.iteritems() %}
-os.environ.setdefault('{{ k }}', '{{ v }}')
-{% endfor %}
-
-from configurations.wsgi import get_wsgi_application
-application = get_wsgi_application()

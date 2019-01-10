@@ -105,7 +105,7 @@ class JobServer(SimpleXMLRPCServer):
 
     def __init__(self, conf):
         SimpleXMLRPCServer.__init__(
-            self, (socket.gethostbyname("back"), int(options['backend_daemon_port'])))
+            self, (socket.gethostbyname("0.0.0.0"), int(options['backend_daemon_port'])))
         self.register_function(self.handle_request, 'start_job')
 
     def handle_request(self, jobtype, joburl):

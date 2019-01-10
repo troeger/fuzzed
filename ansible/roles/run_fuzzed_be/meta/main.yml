@@ -1,5 +1,0 @@
-# Dependencies of this role
----
-dependencies:
-  - { role: run_latex }
-  - { role: build_boost_code }
