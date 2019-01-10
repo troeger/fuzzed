@@ -7,6 +7,7 @@
 '''
 
 import json
+import urlparse
 
 from django.test import LiveServerTestCase, TestCase
 from django.test.client import Client
@@ -129,7 +130,10 @@ class OreTestHelpers():
             response.status_code,
             201)  # test if we got a created job
         assert ('Location' in response)
-        jobUrl = response['Location']
+        # hardcoded host in docker test suite runs
+        parsed = list(urlparse.urlparse(response['Location']))
+        parsed[1] = "front:8000"
+        jobUrl = urlparse.urlunparse(parsed)
         code = 202
         assert (not jobUrl.endswith('jobs/'))
         print "Waiting for result from " + jobUrl,
