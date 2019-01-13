@@ -34,6 +34,7 @@ class Common(Configuration):
     ROOT_URLCONF = 'ore.urls'
     MEDIA_ROOT = ''
     MEDIA_URL = ''
+    USE_X_FORWARDED_HOST = True
     SEND_BROKEN_LINK_EMAILS = False
     SERVER_EMAIL = values.Value('NOT_SET', environ_prefix='ORE')
     SITE_ID = 1
