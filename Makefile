@@ -34,13 +34,13 @@ prod-build: dev-build
 	docker exec -w /ore-front ore-front-dev ./manage.py collectstatic --noinput --configuration=Dev
 	docker-compose down
 	# Build production containers
-	docker build -t troeger/ore-front:0.8.3 -f frontend/docker/Dockerfile.production .
-	docker build -t troeger/ore-back:0.8.3 -f backends/docker/Dockerfile.production .
+	docker build -t troeger/ore-front:0.8.4 -f frontend/docker/Dockerfile.production .
+	docker build -t troeger/ore-back:0.8.4 -f backends/docker/Dockerfile.production .
 
 prod-push:
 	docker login
-	docker push troeger/ore-front:0.8.3 
-	docker push troeger/ore-back:0.8.3
+	docker push troeger/ore-front:0.8.4 
+	docker push troeger/ore-back:0.8.4
 
 # Update version numbers, commit and tag 
 bumpversion:
