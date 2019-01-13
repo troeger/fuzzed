@@ -140,12 +140,16 @@ class JobResource(common.JobResource):
                 response = {}
                 # We deliver the columns layout for the result tables + all
                 # global issues
-                results_url = reverse(
+                relative_url = reverse(
                     'results',
                     kwargs={
                         'api_name': 'front',
                         'pk': job.graph.pk,
                         'secret': job.secret})
+                # This is a quick fix for dealing with reverse() begind an SSL proxy
+                # Normally, Django should consider the X-FORWARDED header inside the reverse()
+                # implementation and figure out by itself what the correct base is
+                results_url = settings.SERVER + relative_url
                 if not job.requires_download:
                     response['columns'] = [
                         {'mData': key, 'sTitle': title} for key, title in job.result_titles]
@@ -247,8 +251,13 @@ class NodeResource(ModelResource):
         """
         node_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse(
+        relative_url =  reverse(
             'node', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': node_client_id})
+        # This is a quick fix for dealing with reverse() begind an SSL proxy
+        # Normally, Django should consider the X-FORWARDED header inside the reverse()
+        # implementation and figure out by itself what the correct base is
+        return settings.SERVER + relative_url
+
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -348,8 +357,12 @@ class NodeGroupResource(ModelResource):
         """
         group_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('nodegroup', kwargs={
+        relative_url = reverse('nodegroup', kwargs={
                        'api_name': 'front', 'pk': graph_pk, 'client_id': group_client_id})
+        # This is a quick fix for dealing with reverse() begind an SSL proxy
+        # Normally, Django should consider the X-FORWARDED header inside the reverse()
+        # implementation and figure out by itself what the correct base is
+        return settings.SERVER + relative_url
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -477,8 +490,9 @@ class EdgeResource(ModelResource):
         """
         edge_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse(
+        relative_url = reverse(
             'edge', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': edge_client_id})
+        return settings.SERVER + relative_url
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -555,7 +569,13 @@ class GraphSerializer(common.GraphSerializer):
             if 'objects' in data:  # object list
                 graphs = []
                 for graph in data['objects']:
-                    graphs.append({'url': reverse('graph', kwargs={'api_name': 'front', 'pk': graph.obj.pk}),
+                    relative_url = reverse('graph', kwargs={'api_name': 'front', 'pk': graph.obj.pk})
+                    # This is a quick fix for dealing with reverse() begind an SSL proxy
+                    # Normally, Django should consider the X-FORWARDED header inside the reverse()
+                    # implementation and figure out by itself what the correct base is
+                    absolute_url = settings.SERVER + relative_url
+
+                    graphs.append({'url': absolute_url,
                                    'name': graph.obj.name})
                 return json.dumps({'graphs': graphs})
             else:
