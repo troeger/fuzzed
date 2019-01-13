@@ -12,7 +12,11 @@ RUN apt-get update \
 
 RUN pip install requests
 
-COPY backends/docker/startup.sh /startup.sh
+COPY backends/docker/startup.sh /ore-back/startup.sh
+COPY backends/daemon.py /ore-back/daemon.py
+COPY backends/daemon.ini /ore-back/daemon.ini
+COPY backends/lib /ore-back/lib
+COPY backends/rendering /ore-back/rendering
 
 EXPOSE 8000
-CMD ["bash", "/startup.sh"]
+CMD ["bash", "/ore-back/startup.sh"]

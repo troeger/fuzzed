@@ -1,6 +1,3 @@
-# Assumes "frontend" directory to be mounted at /ore-front
-
-cd /ore-front
 
 # Wait for postgres to come up
 echo "Waiting for database at '$ORE_DB_HOST' ..."
@@ -18,6 +15,8 @@ echo "Database is up."
 
 if [ "$ORE_MODE" = "development" ]
 then
+    # Assumes "frontend" directory to be mounted at /ore-front
+    cd /ore-front
     export DJANGO_CONFIGURATION=Dev
     ./manage.py migrate 
     ./manage.py runserver 0.0.0.0:8000
@@ -25,6 +24,7 @@ fi
 
 if [ "$ORE_MODE" = "production" ]
 then
+    cd /var/www
     export DJANGO_CONFIGURATION=Production
     ./manage.py migrate 
     rm -f /var/run/apache2/apache2.pid
