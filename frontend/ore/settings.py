@@ -16,13 +16,15 @@ class Common(Configuration):
         }
     }
     # Environment variable "SERVER" contains the host name of the server
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', values.Value('xxx', environ_prefix='ORE', environ_name='SERVER')]
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', values.Value(
+        'xxx', environ_prefix='ORE', environ_name='SERVER')]
     # Environment variable "SERVER_URL" contains the full URL for the server
     SERVER = str(values.Value(
         'xxx', environ_prefix='ORE', environ_name='SERVER_URL'))
     FEEDBACK_PAGE = values.URLValue(
         'https://groups.google.com/forum/#!forum/ore-support', environ_prefix='ORE')
     TERMS_PAGE = values.Value('/about/', environ_prefix='ORE')
+    PRIVACY_PAGE = values.Value('/privacy/', environ_prefix='ORE')
     AUTH_PROFILE_MODULE = 'ore.UserProfile'
     CORS_ORIGIN_ALLOW_ALL = True
     EMAIL_HOST = 'localhost'
@@ -211,16 +213,20 @@ class Dev(Common):
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['console']
     LOGGING['loggers']['ore']['handlers'] = ['console']
+    ADMINS = (('ORE Developer', str(values.Value(
+        'oredeveloper@example.com', environ_prefix='ORE', environ_name='ADMIN_EMAIL'))),)
 
 
 class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False
     SECRET_KEY = values.SecretValue(environ_prefix='ORE')
-    #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    ADMINS = (('ORE Admin', str(values.Value(
-        'xxx', environ_prefix='ORE', environ_name='ADMIN_EMAIL'))),)
+    ADMINS = ((str(values.Value(
+        'xxx', environ_prefix='ORE', environ_name='ADMIN_NAME')),
+        str(values.Value(
+            'xxx', environ_prefix='ORE', environ_name='ADMIN_EMAIL'))),)
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATE_DIRS = (PROJECT_ROOT + '/templates',
                      PROJECT_ROOT + '/static-release/img')

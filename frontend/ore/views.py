@@ -74,6 +74,10 @@ def about(request):
     return render(request, 'util/about.html')
 
 
+def privacy(request):
+    return render(request, 'util/privacy.html')
+
+
 @login_required
 def projects(request):
     """

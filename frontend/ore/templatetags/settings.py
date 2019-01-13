@@ -9,6 +9,10 @@ register = template.Library()
 def setting(name):
     if name == "VERSION":
         return ore.VERSION
+    elif name == "ADMIN_NAME":
+        return settings.ADMINS[0][0]
+    elif name == "ADMIN_EMAIL":
+        return settings.ADMINS[0][1]
     else:
         return getattr(settings, name, "")
 
