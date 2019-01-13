@@ -558,9 +558,13 @@ def settings(request):
     Returns:
      {HttpResponse} a django response object
     """
-    comes_from = request.META["HTTP_REFERER"]
-    if 'settings' not in comes_from:
-        request.session['comes_from'] = comes_from
+    try:
+        comes_from = request.META["HTTP_REFERER"]
+        if 'settings' not in comes_from:
+            request.session['comes_from'] = comes_from
+    except Exception:
+        # deal with missing REFERER
+        request.session['comes_from'] = '/projects/'
     POST = request.POST
 
     if POST.get('save'):
