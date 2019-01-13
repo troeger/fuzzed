@@ -15,7 +15,9 @@ class Common(Configuration):
             'PORT': values.Value('', environ_name='DB_PORT', environ_prefix='ORE'),
         }
     }
+    # Environment variable "SERVER" contains the host name of the server
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', values.Value('xxx', environ_prefix='ORE', environ_name='SERVER')]
+    # Environment variable "SERVER_URL" contains the full URL for the server
     SERVER = str(values.Value(
         'xxx', environ_prefix='ORE', environ_name='SERVER_URL'))
     FEEDBACK_PAGE = values.URLValue(
