@@ -28,7 +28,7 @@ You can try the editor at https://live.ore-project.org.
 
 ## Production Deployment
 
-The latest release of ORE is available on Docker Hub. Check the docker-compose.yml file for neccessary environment variables.
+The latest release of ORE is available on Docker Hub. 
 
 ## Development
 
