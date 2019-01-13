@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ore-back
+  labels:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: back
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ore
+      app.kubernetes.io/component: back
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ore
+        app.kubernetes.io/component: back
+    spec:
+      containers:
+      - name: ore-back
+        image: troeger/ore-back:0.8.0

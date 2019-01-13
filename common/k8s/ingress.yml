@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ore
+  labels:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: front
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+  - secretName: ore-front-tls
+    hosts:
+    - <external hostname for frontend>
+  rules:
+  - host: <external hostname for frontend>
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: ore-front
+          servicePort: 80

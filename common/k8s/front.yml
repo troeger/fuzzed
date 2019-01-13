@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ore-front
+  labels:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: front
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ore
+      app.kubernetes.io/component: front
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ore
+        app.kubernetes.io/component: front
+    spec:
+      containers:
+      - name: ore-front
+        image: troeger/ore-front:0.8.0
+        ports:
+        - containerPort: 80
+        env:
+        - name:  ORE_BACKEND_DAEMON
+          value: <backend container internal URL>
+        - name:  ORE_SERVER_URL
+          value: <frontend container internal URL>
+        - name:  ORE_SERVER
+          value: <frontend container internal hostname>
+        - name:  ORE_DB_NAME
+          value: ore 
+        - name:  ORE_DB_USER
+          value: ore 
+        - name:  ORE_DB_PASSWORD
+          value: ore 
+        - name:  ORE_DB_HOST
+          value: <database container internal hostname>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ore-front
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: front

@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ore-db-pv-claim
+  labels:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ore-db
+  labels:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: db
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ore
+      app.kubernetes.io/component: db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ore
+        app.kubernetes.io/component: db
+    spec:
+      containers:
+      - name: ore-db
+        image: postgres:9
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "ore"
+        - name: POSTGRES_USER
+          value: "ore"
+        - name: POSTGRES_PASSWORD
+          value: "ore"
+        volumeMounts:
+        - name: ore-db-storage
+          mountPath: /var/lib/postgresql/data 
+
+      volumes:
+      - name: ore-db-storage
+        persistentVolumeClaim:
+          claimName: ore-db-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ore-db
+spec:
+  ports:
+  - port: 5432
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: db
