@@ -4,6 +4,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.conf import settings
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
@@ -86,8 +87,12 @@ class JobResource(common.JobResource):
         """
         job_secret = bundle_or_obj.obj.secret
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse(
+        # This is a quick fix for dealing with reverse() begind an SSL proxy
+        # Normally, Django should consider the X-FORWARDED header inside the reverse()
+        # implementation and figure out by itself what the correct base is
+        relative_url = reverse(
             'job', kwargs={'api_name': 'front', 'pk': graph_pk, 'secret': job_secret})
+        return settings.SERVER + relative_url
 
     def obj_create(self, bundle, **kwargs):
         """
