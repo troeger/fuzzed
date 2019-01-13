@@ -167,11 +167,6 @@ class Common(Configuration):
                 'class': 'django.utils.log.AdminEmailHandler',
                 'filters': ['require_debug_false'],
             },
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/tmp/ore.log',
-            },
             'False': {
                 'level': 'DEBUG',
                 'class': 'logging.NullHandler',
@@ -179,17 +174,17 @@ class Common(Configuration):
         },
         'loggers': {
             'django.request': {
-                'handlers': ['mail_admins', 'file', 'console'],
+                'handlers': ['mail_admins', 'console'],
                 'level': 'ERROR',
                 'propagate': True,
             },
             'ore': {
-                'handlers': ['console', 'file'],
+                'handlers': ['console', ],
                 'level': 'DEBUG',
                 'propagate': True,
             },
             'social': {
-                'handlers': ['console', 'file'],
+                'handlers': ['console', ],
                 'level': 'DEBUG',
                 'propagate': True,
             },
@@ -219,7 +214,8 @@ class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False
     SECRET_KEY = values.SecretValue(environ_prefix='ORE')
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     ADMINS = (('ORE Admin', str(values.Value(
         'xxx', environ_prefix='ORE', environ_name='ADMIN_EMAIL'))),)
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -227,5 +223,5 @@ class Production(Common):
                      PROJECT_ROOT + '/static-release/img')
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['mail_admins']
-    LOGGING['loggers']['ore']['handlers'] = ['file']
+    LOGGING['loggers']['ore']['handlers'] = ['console']
     FOOTER = values.Value('ORE Development Team', environ_prefix='ORE')
