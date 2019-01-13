@@ -12,9 +12,9 @@ spec:
   tls:
   - secretName: ore-front-tls
     hosts:
-    - <external hostname for frontend>
+    - live.ore-project.org
   rules:
-  - host: <external hostname for frontend>
+  - host: live.ore-project.org
     http:
       paths:
       - path:
