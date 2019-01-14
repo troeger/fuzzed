@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ore-config
+  labels:
+    app.kubernetes.io/name: ore
+    app.kubernetes.io/component: front
+data:
+  ORE_ADMIN_NAME: <your real name>
+  ORE_ADMIN_EMAIL: <your real email address>
+  ORE_SERVER_URL: <Complete server URL, without trailing slash>
+  ORE_SERVER: <hostname of the server>
+  ORE_SECRET_KEY: <arbitrary unique set of characters>
+  ORE_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: <OAuth Key>
+  ORE_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: <OAuth Secret>
+  ORE_SOCIAL_AUTH_TWITTER_KEY: <OAuth Key>
+  ORE_SOCIAL_AUTH_TWITTER_SECRET: <OAuth Secret>
+  ORE_SOCIAL_AUTH_GITHUB_KEY: <OAuth Key>
+  ORE_SOCIAL_AUTH_GITHUB_SECRET: <OAuth Secret>

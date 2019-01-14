@@ -1,6 +1,7 @@
 *.pyc
 *.log
 .DS_Store
+common/k8s/config.yml
 frontend/ore/models/node_rendering.py
 frontend/ore/models/notations.py
 frontend/ore/models/xml_backend.py

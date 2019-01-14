@@ -22,13 +22,10 @@ spec:
         image: troeger/ore-front:0.8.4
         ports:
         - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: ore-config
         env:
-        - name:  ORE_BACKEND_DAEMON
-          value: http://ore-back:8000
-        - name:  ORE_SERVER_URL
-          value: https://live.ore-project.org
-        - name:  ORE_SERVER
-          value: live.ore-project.org
         - name:  ORE_DB_NAME
           value: ore 
         - name:  ORE_DB_USER
@@ -39,20 +36,6 @@ spec:
           value: ore-db
         - name:  ORE_DB_PORT   # need to set that, otherwise overwritten by older K8S (see #60999)
           value: "5432"
-        - name: ORE_SECRET_KEY
-          value: 28ehfwoifqh!##asdasu
-        - name: ORE_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
-          value: 907559039211-4qan8v4o12vh9r6ifb4295efmu4ll9fh.apps.googleusercontent.com
-        - name: ORE_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
-          value: nvP3Lf0k0JyZZPruG0hex9fh
-        - name: ORE_SOCIAL_AUTH_TWITTER_KEY
-          value: E0TOSwoGhncQtm0cP19pFbHfb
-        - name: ORE_SOCIAL_AUTH_TWITTER_SECRET
-          value: c7Ko25wkhrUMd2TeYpHR5YTQzzHw1l0vaVer5XVD2zuVdS17ta
-        - name: ORE_SOCIAL_AUTH_GITHUB_KEY
-          value: a5a3dff5f02053503068
-        - name: ORE_SOCIAL_AUTH_GITHUB_SECRET
-          value: 822b855cc315229a5d488def5afdb4ce21b77820
 ---
 apiVersion: v1
 kind: Service
