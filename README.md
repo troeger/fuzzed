@@ -24,7 +24,11 @@ The editor supports the following generic features for all diagram types:
 * Analytical and simulation-based analysis of fault tree and FuzzTree diagrams. 
 * REST API for creating new diagrams with external software.
 
-You can try the editor at http://fuzzed.org.
+You can try the editor at https://live.ore-project.org.
+
+## Production Deployment
+
+The latest release of ORE is available on Docker Hub. 
 
 ## Development
 
@@ -34,11 +38,15 @@ The only supported environment for development is Docker Compose.
 
 Get a checkout and run:
 
-``make build``
+``make dev-build``
 
-This prepares docker images for the frontend and the backend part, compiles neccessary code parts, starts the images and runs the frontend Django development server, the backend daemon and the database in separate containers.
+This prepares docker images for the frontend and the backend part and compiles neccessary code parts inside the containers.
 
-After finishing, you should be able to use the frontend on your machine at http://localhost:8000. The start page has a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
+Now run:
+
+``make dev-up``
+
+This starts the images and runs the frontend Django development server, the backend daemon and the database in separate containers. You should now be able to use the frontend on your machine at http://localhost:8000. The start page has a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
 
 If your working on a staging machine, a valid option is to get an OpenID from somewhere such as https://openid.stackexchange.com.
 
