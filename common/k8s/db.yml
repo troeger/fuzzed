@@ -45,7 +45,7 @@ spec:
           value: "ore"
         volumeMounts:
         - name: ore-db-storage
-          mountPath: /var/lib/postgresql/data 
+          mountPath: /var/lib/postgresql 
 
       volumes:
       - name: ore-db-storage
