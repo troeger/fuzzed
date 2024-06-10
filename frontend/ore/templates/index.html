@@ -86,8 +86,8 @@
                 </form>    
             </div>
         </div>
-        {% get_debug_status as debug %}
-        {% if debug %}
+        {% get_dev_login as dev_login %}
+        {% if dev_login %}
         <div>
                 <a href="{% url 'social:begin' 'username' %}?next={{ next }}"><b>Developer Login</b></a>
         </div>

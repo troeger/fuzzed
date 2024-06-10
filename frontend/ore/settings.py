@@ -217,6 +217,7 @@ class Dev(Common):
         'oredeveloper@example.com', environ_prefix='ORE', environ_name='ADMIN_EMAIL'))),)
 
 
+DEV_LOGIN = bool(os.environ.get('ORE_DEV_LOGIN', False))
 class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False
@@ -234,3 +235,7 @@ class Production(Common):
     LOGGING['loggers']['django.request']['handlers'] = ['mail_admins']
     LOGGING['loggers']['ore']['handlers'] = ['console']
     FOOTER = values.Value('ORE Development Team', environ_prefix='ORE')
+
+    SOCIAL_AUTH_USERNAME_FORM_URL = '/'
+    SOCIAL_AUTH_USERNAME_FORM_HTML = 'dev_login.html' if DEV_LOGIN is True else None
+    AUTHENTICATION_BACKENDS = Common.AUTHENTICATION_BACKENDS + ('social.backends.username.UsernameAuth',) if DEV_LOGIN is True else Common.AUTHENTICATION_BACKENDS

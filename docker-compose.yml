@@ -1,48 +1,47 @@
 version: '3'
 
 services:
-  ore-db-dev:
+  ore-db:
     image: postgres:9
-    container_name: ore-db-dev
+    container_name: ore-db
     environment:
       POSTGRES_PASSWORD: ore
       POSTGRES_USER: ore
       POSTGRES_DB: ore
+    restart: always
     volumes:
-      - postgres-volume:/var/lib/postgresql/data  
-  ore-front-dev:
-    image: ore-front-dev
-    container_name: ore-front-dev
-    build: 
+      - postgres-volume:/var/lib/postgresql/data
+
+  ore-front:
+    image: ghcr.io/osmhpi/fuzzed:fe-latest
+    container_name: ore-front
+    build:
       context: .
-      dockerfile: ./frontend/docker/Dockerfile.development
+      dockerfile: ./frontend/Dockerfile
+    restart: always
     environment:
-      ORE_BACKEND_DAEMON: http://ore-back-dev:8000
-      ORE_SERVER_URL: http://ore-front-dev:8000
-      ORE_SERVER: ore-front-dev
-      ORE_DB_NAME: ore 
-      ORE_DB_USER: ore 
-      ORE_DB_PASSWORD: ore 
-      ORE_DB_HOST: ore-db-dev
-    tty: true
+      ORE_BACKEND_DAEMON: http://ore-back:8000
+      ORE_SERVER_URL: http://ore-front:8000
+      ORE_SERVER: ore-front # this adds a host to allowed hosts
+      ORE_DB_NAME: ore
+      ORE_DB_USER: ore
+      ORE_DB_PASSWORD: ore
+      ORE_DB_HOST: ore-db
+      ORE_SECRET_KEY: change-me-to-something-random-and-very-secret
+      ORE_DEV_LOGIN: 1
     ports:
       - 8000:8000
     depends_on:
-      - ore-db-dev
-      - ore-back-dev
-    volumes:
-      - ./frontend:/ore-front
-      - ./common:/ore-common 
-  ore-back-dev:
-    image: ore-back-dev
-    container_name: ore-back-dev
-    build: 
+      - ore-db
+      - ore-back
+
+  ore-back:
+    image: ghcr.io/osmhpi/fuzzed:be-latest
+    container_name: ore-back
+    restart: always
+    build:
       context: .
-      dockerfile: ./backends/docker/Dockerfile.development
-    tty: true
-    volumes:
-      - ./backends:/ore-back 
-      - ./common:/ore-common 
+      dockerfile: ./backends/Dockerfile
 
 volumes:
   postgres-volume:

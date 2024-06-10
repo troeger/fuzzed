@@ -1,3 +1,21 @@
+> This project is unmaintained.
+>
+> It should not be run exposed to the Internet or placed behind a secure
+> reverse proxy with authentication in front.
+>
+> All versions are pinned so that the `Dockerfile` should build. For a
+> working example please see `docker-compose.yml`.
+>
+> Graphs cannot be imported via the user interface.
+> However the database can be backed up
+> (`docker compose exec ore-db pg_dump -U ore -d ore > backup.sql`)
+> and restored
+> (`docker-compose exec -T ore-db psql -U ore -d ore < backup.sql`).
+> For this, make sure to remember your username.
+> If the database is already used, it can be dropped by running
+> `docker-compose exec ore-db dropdb -U ore ore` and recreated empty by
+> running `docker-compose exec ore-db createdb -U ore ore`.
+
 [![Build Status](https://travis-ci.org/troeger/fuzzed.svg?branch=master)](https://travis-ci.org/troeger/fuzzed)
 [![Security Status](https://pyup.io/repos/github/troeger/fuzzed/shield.svg)]( https://pyup.io/repos/github/troeger/fuzzed/)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/troeger/fuzzed/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/troeger/fuzzed/?branch=master)

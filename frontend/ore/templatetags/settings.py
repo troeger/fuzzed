@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 import ore
+import os
 
 register = template.Library()
 
@@ -18,5 +19,5 @@ def setting(name):
 
 
 @register.assignment_tag
-def get_debug_status():
-    return settings.DEBUG is True
+def get_dev_login():
+    return bool(os.environ.get('ORE_DEV_LOGIN', False)) is True or settings.DEBUG is True

@@ -392,7 +392,7 @@ class Node(models.Model):
                 # the name
                 propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}" % propvalue
             else:
-                propvalue = "{\\it\\scriptsize %s}" % propvalue
+                propvalue = "{\\textit\\scriptsize %s}" % propvalue
             propvalue = propvalue.decode('utf-8')
             mirrorText += propvalue + "\\\\"
         # Create child nodes and their edges
